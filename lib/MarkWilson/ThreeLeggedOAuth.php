@@ -208,11 +208,13 @@ class ThreeLeggedOAuth
     /**
      * Request a token
      *
+     * @param string $callbackUrl Callback URL
+     *
      * @return void
      */
-    public function requestToken()
+    public function requestToken($callbackUrl = null)
     {
-        $token = $this->oauth->getRequestToken($this->buildUrl($this->requestTokenPath));
+        $token = $this->oauth->getRequestToken($this->buildUrl($this->requestTokenPath), $callbackUrl);
 
         $this->session->set('token', $token['oauth_token']);
         $this->session->set('secret', $token['oauth_token_secret']);
