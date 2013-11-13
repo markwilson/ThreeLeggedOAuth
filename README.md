@@ -1,5 +1,15 @@
 # 3-legged OAuth
 
+# Installation
+
+## Via composer
+
+Add `markwilson/three-legged-oauth` to your composer.json requirements.
+
+```` sh
+php composer.phar install
+````
+
 ## Usage
 
 ```` php
