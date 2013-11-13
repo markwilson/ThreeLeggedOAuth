@@ -1,8 +1,8 @@
 # 3-legged OAuth
 
-# Installation
+## Installation
 
-## Via composer
+### Via composer
 
 Add `markwilson/three-legged-oauth` to your composer.json requirements.
 
