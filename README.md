@@ -77,3 +77,8 @@ if ($oauth->isAuthorised()) {
     $oauth->requestToken('http://' . $_SERVER['HTTP_HOST'] . '/');
 }
 ````
+
+## Todo list
+
+- Remove Symfony session dependency
+- Include interface for persisting tokens between requests
