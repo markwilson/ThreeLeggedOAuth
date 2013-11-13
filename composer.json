@@ -1,0 +1,20 @@
+{
+    "name": "markwilson/oauth",
+    "description": "Oauth app base",
+    "keywords": ["oauth"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Wilson",
+            "email": "mark@89allport.co.uk"
+        }
+    ],
+    "require": {
+        "symfony/http-foundation": "2.3.6"
+    },
+    "autoload": {
+        "psr-0": {
+            "MarkWilson\\": "lib/"
+        }
+    }
+}
