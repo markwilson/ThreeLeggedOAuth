@@ -1,5 +1,5 @@
 {
-    "name": "markwilson/oauth",
+    "name": "markwilson/three-legged-oauth",
     "description": "Oauth app base",
     "keywords": ["oauth"],
     "license": "MIT",
