@@ -2,7 +2,7 @@
 
 namespace MarkWilson;
 
-use Symfony\Component\HttpFoundation\Session\Session;
+use MarkWilson\TokenStorage\TokenStorageInterface;
 
 /**
  * OAuth wrapper class
@@ -14,27 +14,11 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class ThreeLeggedOAuth
 {
     /**
-     * Authorisation status
-     */
-    const NOT_STARTED = 0;
-    const PENDING_AUTHORISATION = 1;
-    const AUTHORISED = 2;
-    /**
-     * @TODO: implement authorisation failed handler - should also allow user to initialise a restart of authorisation
-     */
-    const AUTHORISATION_FAILED = 3;
-
-    /**
-     * @TODO: implement session namespace
-     */
-    CONST SESSION_NAMESPACE = 'oauth';
-
-    /**
-     * Session instance
+     * Token storage interface
      *
-     * @var Session
+     * @var TokenStorageInterface
      */
-    private $session;
+    private $tokenStorage;
 
     /**
      * OAuth instance
@@ -88,23 +72,26 @@ class ThreeLeggedOAuth
     /**
      * Constructor.
      *
-     * @param string  $baseUrl        OAuth base URL
-     * @param string  $consumerKey    Consumer key
-     * @param string  $consumerSecret Consumer secret
-     * @param Session $session        Session instance
-     * @param string  $requestBaseUrl Base URL for subsequent requests
+     * @param string                   $baseUrl         OAuth base URL
+     * @param string                   $consumerKey     Consumer key
+     * @param string                   $consumerSecret  Consumer secret
+     * @param TokenStorageInterface $persistentToken Session instance
+     * @param string                   $requestBaseUrl  Base URL for subsequent requests
      */
-    public function __construct($baseUrl, $consumerKey, $consumerSecret, Session $session, $requestBaseUrl = null)
+    public function __construct($baseUrl, $consumerKey, $consumerSecret, TokenStorageInterface $persistentToken, $requestBaseUrl = null)
     {
-        $this->baseUrl        = $baseUrl;
-        $this->appUrl         = $_SERVER['PHP_SELF'];
-        $this->session        = $session;
-        $this->requestBaseUrl = $requestBaseUrl;
+        $this->baseUrl         = $baseUrl;
+        $this->appUrl          = $_SERVER['PHP_SELF'];
+        $this->tokenStorage = $persistentToken;
+        $this->requestBaseUrl  = $requestBaseUrl;
 
         $this->oauth = new \OAuth($consumerKey, $consumerSecret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-        $this->loadSessionToken();
 
-        $this->initialiseSession();
+        if ($this->tokenStorage->hasTokenData()) {
+            $this->loadSessionToken();
+        }
+
+        $this->tokenStorage->initialise();
     }
 
     /**
@@ -172,7 +159,7 @@ class ThreeLeggedOAuth
      */
     public function isAuthorised()
     {
-        return $this->session->get('status') === self::AUTHORISED;
+        return $this->tokenStorage->getStatus() === TokenStorageInterface::AUTHORISED;
     }
 
     /**
@@ -182,7 +169,7 @@ class ThreeLeggedOAuth
      */
     public function isPendingAuthorisation()
     {
-        return $this->session->get('status') === self::PENDING_AUTHORISATION;
+        return $this->tokenStorage->getStatus() === TokenStorageInterface::PENDING_AUTHORISATION;
     }
 
     /**
@@ -192,7 +179,7 @@ class ThreeLeggedOAuth
      */
     public function isNotStarted()
     {
-        return $this->session->get('status') === self::NOT_STARTED;
+        return $this->tokenStorage->getStatus() === TokenStorageInterface::NOT_STARTED;
     }
 
     /**
@@ -202,7 +189,7 @@ class ThreeLeggedOAuth
      */
     public function getStatus()
     {
-        return $this->session->get('status');
+        return $this->tokenStorage->getStatus();
     }
 
     /**
@@ -216,10 +203,10 @@ class ThreeLeggedOAuth
     {
         $token = $this->oauth->getRequestToken($this->buildUrl($this->requestTokenPath), $callbackUrl);
 
-        $this->session->set('token', $token['oauth_token']);
-        $this->session->set('secret', $token['oauth_token_secret']);
+        $this->tokenStorage->setToken($token['oauth_token']);
+        $this->tokenStorage->setSecret($token['oauth_token_secret']);
 
-        $this->session->set('status', self::PENDING_AUTHORISATION);
+        $this->tokenStorage->setStatus(TokenStorageInterface::PENDING_AUTHORISATION);
 
         // @todo: allow user customisation of building redirect url
         $this->redirect($this->buildUrl($this->authorisePath) . '?oauth_token=' . $token['oauth_token']);
@@ -234,10 +221,10 @@ class ThreeLeggedOAuth
     {
         $token = $this->oauth->getAccessToken($this->buildUrl($this->accessTokenPath));
 
-        $this->session->set('token', $token['oauth_token']);
-        $this->session->set('secret', $token['oauth_token_secret']);
+        $this->tokenStorage->setToken($token['oauth_token']);
+        $this->tokenStorage->setSecret($token['oauth_token_secret']);
 
-        $this->session->set('status', self::AUTHORISED);
+        $this->tokenStorage->setStatus(TokenStorageInterface::AUTHORISED);
 
         $this->redirect($this->appUrl);
     }
@@ -320,8 +307,8 @@ class ThreeLeggedOAuth
      */
     private function loadSessionToken()
     {
-        $token  = $this->session->get('token');
-        $secret = $this->session->get('secret');
+        $token  = $this->tokenStorage->getToken();
+        $secret = $this->tokenStorage->getSecret();
 
         if ($token && $secret) {
             $this->oauth->setToken($token, $secret);
@@ -337,19 +324,5 @@ class ThreeLeggedOAuth
     {
         header('Location: ' . $url);
         exit;
-    }
-
-    /**
-     * Initialise the session, if required
-     *
-     * @return void
-     */
-    private function initialiseSession()
-    {
-        $session = $this->session;
-
-        if (!$session->get('status')) {
-            $session->set('status', self::NOT_STARTED);
-        }
     }
 }
