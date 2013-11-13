@@ -64,12 +64,8 @@ if ($oauth->isAuthorised()) {
 
     $jsonDecoded = json_decode($response);
 
-    if ($jsonDecoded) {
-        foreach ($jsonDecoded as $tweet) {
-            echo $tweet->user->name . ': ' . $tweet->text . '<br />';
-        }
-    } else {
-        echo $response;
+    foreach ($jsonDecoded as $tweet) {
+        echo $tweet->user->name . ': ' . $tweet->text . '<br />';
     }
 } elseif ($oauth->isPendingAuthorisation()) {
     $oauth->getAccessToken();
