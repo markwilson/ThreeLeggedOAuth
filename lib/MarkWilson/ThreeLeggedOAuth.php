@@ -302,6 +302,19 @@ class ThreeLeggedOAuth
     }
 
     /**
+     * Clear the current access token
+     *
+     * @return $this
+     */
+    public function logout()
+    {
+        $this->session->remove('token');
+        $this->session->remove('secret');
+
+        $this->session->set('status', self::NOT_STARTED);
+    }
+
+    /**
      * Build the URL
      *
      * @param string $suffix Suffix for base URL
