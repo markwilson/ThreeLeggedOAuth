@@ -292,6 +292,8 @@ class ThreeLeggedOAuth
                 var_dump($this->oauth->debugInfo);
             }
 
+            $this->session->set('last_exception', $e->getMessage());
+
             throw $e;
         }
 
