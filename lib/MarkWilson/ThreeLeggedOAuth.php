@@ -317,6 +317,34 @@ class ThreeLeggedOAuth
     }
 
     /**
+     * Has there been an exception raised?
+     *
+     * @return boolean
+     */
+    public function hasLastException()
+    {
+        return $this->session->has('last_exception');
+    }
+
+    /**
+     * Get the last exception message
+     *
+     * @param boolean $clear Should it clear the message?
+     *
+     * @return string
+     */
+    public function getLastException($clear = true)
+    {
+        $message = $this->session->get('last_exception');
+
+        if ($clear) {
+            $this->session->remove('last_exception');
+        }
+
+        return $message;
+    }
+
+    /**
      * Build the URL
      *
      * @param string $suffix Suffix for base URL
