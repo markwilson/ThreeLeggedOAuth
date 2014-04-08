@@ -305,6 +305,8 @@ class ThreeLeggedOAuth
                 var_dump($this->oauth->debugInfo);
             }
 
+            $this->session->set('last_exception', $e->getMessage());
+
             throw $e;
         }
 
@@ -360,6 +362,46 @@ class ThreeLeggedOAuth
         return $this->oauth->getLastResponse();
     }
 
+    /**
+     * Clear the current access token
+     *
+     * @return $this
+     */
+    public function logout()
+    {
+        $this->session->remove('token');
+        $this->session->remove('secret');
+
+        $this->session->set('status', self::NOT_STARTED);
+    }
+
+    /**
+     * Has there been an exception raised?
+     *
+     * @return boolean
+     */
+    public function hasLastException()
+    {
+        return $this->session->has('last_exception');
+    }
+
+    /**
+     * Get the last exception message
+     *
+     * @param boolean $clear Should it clear the message?
+     *
+     * @return string
+     */
+    public function getLastException($clear = true)
+    {
+        $message = $this->session->get('last_exception');
+
+        if ($clear) {
+            $this->session->remove('last_exception');
+        }
+
+        return $message;
+    }
 
     /**
      * Build the URL
