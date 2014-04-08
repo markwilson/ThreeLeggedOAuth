@@ -315,6 +315,53 @@ class ThreeLeggedOAuth
     }
 
     /**
+     * Make a PUT request to a URL
+     *
+     * @param string  $url          URL to access
+     * @param array   $data         Put data
+     * @param integer $formAuthType Change the form authentication type temporarily
+     *
+     * @return string
+     *
+     * @throws \OAuthException If invalid request is made
+     */
+    public function put($url, array $data = array(), $formAuthType = OAUTH_AUTH_TYPE_AUTHORIZATION)
+    {
+        if (is_string($this->requestBaseUrl)) {
+            $url = $this->requestBaseUrl . $url;
+        }
+
+        // change the auth type to use form data
+        $this->oauth->setAuthType($formAuthType);
+
+        $this->oauth->fetch($url, $data, OAUTH_HTTP_METHOD_PUT);
+
+        // reset the auth type back to default
+        $this->oauth->setAuthType(OAUTH_AUTH_TYPE_AUTHORIZATION);
+
+        return $this->oauth->getLastResponse();
+    }
+
+    /**
+     * Make a request to a URL
+     *
+     * @param string $url URL to access
+     *
+     * @return string
+     */
+    public function delete($url)
+    {
+        if (is_string($this->requestBaseUrl)) {
+            $url = $this->requestBaseUrl . $url;
+        }
+
+        $this->oauth->fetch($url, array(), OAUTH_HTTP_METHOD_DELETE);
+
+        return $this->oauth->getLastResponse();
+    }
+
+
+    /**
      * Build the URL
      *
      * @param string $suffix Suffix for base URL
