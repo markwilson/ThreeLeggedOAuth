@@ -234,7 +234,7 @@ class ThreeLeggedOAuth
     {
         $token = $this->oauth->getAccessToken($this->buildUrl($this->accessTokenPath));
 
-        $this->setAccessToken($token['token'], $token['token_secret']);
+        $this->setAccessToken($token['oauth_token'], $token['oauth_token_secret']);
     }
 
     /**
