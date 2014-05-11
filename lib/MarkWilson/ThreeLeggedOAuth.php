@@ -423,6 +423,21 @@ class ThreeLeggedOAuth
     }
 
     /**
+     * Set the current access token
+     *
+     * @param string $token  Token key
+     * @param string $secret Token secret
+     *
+     * @return $this
+     */
+    public function setCurrentAccessToken($token, $secret)
+    {
+        $this->oauth->setToken($token, $secret);
+
+        return $this;
+    }
+
+    /**
      * Build the URL
      *
      * @param string $suffix Suffix for base URL
@@ -445,7 +460,7 @@ class ThreeLeggedOAuth
         $secret = $this->session->get('secret');
 
         if ($token && $secret) {
-            $this->oauth->setToken($token, $secret);
+            $this->setCurrentAccessToken($token, $secret);
         }
     }
 
