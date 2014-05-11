@@ -404,6 +404,25 @@ class ThreeLeggedOAuth
     }
 
     /**
+     * Get the access token in session
+     *
+     * @return array
+     *
+     * @throws \RuntimeException If no access token is available
+     */
+    public function getCurrentAccessToken()
+    {
+        if (!$this->isAuthorised()) {
+            throw new \RuntimeException('No access token is available when not authorised');
+        }
+
+        return array(
+            'token' => $this->session->get('token'),
+            'secret' => $this->session->get('secret')
+        );
+    }
+
+    /**
      * Build the URL
      *
      * @param string $suffix Suffix for base URL
