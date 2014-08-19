@@ -276,16 +276,17 @@ class ThreeLeggedOAuth
     /**
      * Make a POST request to a URL
      *
-     * @param string  $url          URL to access
-     * @param array   $data         Post data
-     * @param integer $formAuthType Change the form authentication type temporarily
-     * @param boolean $debug        Debug the request
+     * @param string  $url               URL to access
+     * @param array   $data              Post data
+     * @param integer $formAuthType      Change the form authentication type temporarily
+     * @param array   $additionalHeaders Additional headers to send
+     * @param boolean $debug             Debug the request
      *
      * @return string
      *
      * @throws \OAuthException If invalid request is made
      */
-    public function post($url, array $data = array(), $formAuthType = OAUTH_AUTH_TYPE_AUTHORIZATION, $debug = false)
+    public function post($url, array $data = array(), $formAuthType = OAUTH_AUTH_TYPE_AUTHORIZATION, $additionalHeaders = array(), $debug = false)
     {
         if (is_string($this->requestBaseUrl)) {
             $url = $this->requestBaseUrl . $url;
@@ -299,7 +300,7 @@ class ThreeLeggedOAuth
         $this->oauth->setAuthType($formAuthType);
 
         try {
-            $this->oauth->fetch($url, $data, OAUTH_HTTP_METHOD_POST);
+            $this->oauth->fetch($url, $data, OAUTH_HTTP_METHOD_POST, $additionalHeaders);
         } catch (\OAuthException $e) {
             if ($debug) {
                 var_dump($this->oauth->debugInfo);
