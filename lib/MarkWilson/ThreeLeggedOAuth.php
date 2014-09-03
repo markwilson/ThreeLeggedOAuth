@@ -443,6 +443,11 @@ class ThreeLeggedOAuth
     {
         $this->oauth->setToken($token, $secret);
 
+        $this->session->set('token', $token);
+        $this->session->set('secret', $secret);
+
+        $this->session->set('status', self::AUTHORISED);
+
         return $this;
     }
 
