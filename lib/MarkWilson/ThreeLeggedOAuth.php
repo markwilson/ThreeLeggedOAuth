@@ -232,7 +232,15 @@ class ThreeLeggedOAuth
      */
     public function getAccessToken()
     {
-        $token = $this->oauth->getAccessToken($this->buildUrl($this->accessTokenPath));
+        try {
+            $token = $this->oauth->getAccessToken($this->buildUrl($this->accessTokenPath));
+        } catch (\OAuthException $e) {
+            $this->session->remove('token');
+            $this->session->remove('secret');
+            $this->session->set('status', self::NOT_STARTED);
+
+            throw $e;
+        }
 
         $this->setAccessToken($token['oauth_token'], $token['oauth_token_secret']);
     }
