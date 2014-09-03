@@ -498,7 +498,7 @@ class ThreeLeggedOAuth
     {
         $session = $this->session;
 
-        if (!$session->get('status')) {
+        if (null === $session->get('status')) {
             $session->set('status', self::NOT_STARTED);
         }
     }
