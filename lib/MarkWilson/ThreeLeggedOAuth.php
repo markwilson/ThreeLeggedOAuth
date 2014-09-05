@@ -434,19 +434,28 @@ class ThreeLeggedOAuth
     /**
      * Set the current access token
      *
-     * @param string $token  Token key
-     * @param string $secret Token secret
+     * @param string       $token  Token key
+     * @param string       $secret Token secret
+     * @param integer|null $status New status to set
      *
      * @return $this
+     *
+     * @throws \InvalidArgumentException If the status is invalid
      */
-    public function setCurrentAccessToken($token, $secret)
+    public function setCurrentAccessToken($token, $secret, $status = null)
     {
         $this->oauth->setToken($token, $secret);
 
         $this->session->set('token', $token);
         $this->session->set('secret', $secret);
 
-        $this->session->set('status', self::AUTHORISED);
+        if ($status !== null) {
+            if (!in_array($status, array(self::AUTHORISATION_FAILED, self::AUTHORISED, self::PENDING_AUTHORISATION, self::NOT_STARTED))) {
+                throw new \InvalidArgumentException();
+            }
+
+            $this->session->set('status', $status);
+        }
 
         return $this;
     }
