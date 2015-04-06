@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "symfony/http-foundation": "2.3.x"
+        "symfony/http-foundation": "~2.3"
     },
     "autoload": {
         "psr-0": {
